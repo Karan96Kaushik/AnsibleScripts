@@ -1,0 +1,30 @@
+---
+- name: Setup Playbook
+  hosts: sx-staging-bulk
+
+  tasks:
+    - name: Install NPM
+      become: yes
+      apt:
+        name: npm
+        state: latest
+
+    - name: Install n
+      community.general.npm:
+        name: n
+        global: yes
+        state: present
+
+    - name: Install pm2
+      community.general.npm:
+        name: n
+        global: yes
+        state: present
+
+    - name: Setup node version 16.15
+      become: yes
+      shell:
+        cmd: n 16.15
+
+
+

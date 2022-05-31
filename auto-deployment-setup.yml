@@ -1,0 +1,65 @@
+---
+- name: Auto-Deployment Playbook
+  hosts: sx-staging-bulk
+  become: yes
+  tasks:
+
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+        # allow_downgrade: yes
+
+    - name: Install FCGI
+      apt:
+        name: fcgiwrap
+        state: present
+
+    - name: Copy FCGI conf
+      ansible.builtin.copy:
+        src: /Users/karan/Documents/ansible-playbooks/auto-deployment/fcgiwrap.service
+        dest: /lib/systemd/system/fcgiwrap.service
+
+    - name: Restart FCGI as ubuntu
+      shell: "systemctl daemon-reload"
+
+    - name: Restart FCGI as ubuntu
+      shell: "systemctl restart fcgiwrap.service"
+
+    - name: Copy NGINX conf
+      ansible.builtin.copy:
+        src: /Users/karan/Documents/ansible-playbooks/auto-deployment/nginx-auto-deployment.conf
+        dest: /etc/nginx/sites-available/auto-deployment.conf
+
+    - name: Create NGINX symbolic link 
+      file:
+        src: "/etc/nginx/sites-available/auto-deployment.conf"
+        dest: "/etc/nginx/sites-enabled/auto-deployment.conf"
+        state: link
+
+    - name: Create cgi-bin dir
+      shell: "mkdir /home/ubuntu/scripts/cgi-bin -p"
+
+    - name: Copy deploy.cgi file
+      ansible.builtin.copy:
+        src: /Users/karan/Documents/ansible-playbooks/auto-deployment/deploy.cgi
+        dest: /home/ubuntu/scripts/cgi-bin/deploy.cgi
+
+    - name: Create cgi-bin dir
+      shell: "chmod +x /home/ubuntu/scripts/cgi-bin/deploy.cgi"
+
+    - name: Delete default NGINX conf
+      file:
+        state: absent
+        path: /etc/nginx/sites-enabled/default
+
+    - name: Restart NGINX
+      service: name=nginx state=restarted enabled=yes
+        
+    - name: Test auto deployment setup
+      shell: "wget http://localhost:8090/cgi-bin/deploy.cgi && cat deploy.cgi && rm deploy.cgi"
+      register: command_output
+    - debug:
+        var: command_output.stdout_lines
+        
+

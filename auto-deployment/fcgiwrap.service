@@ -1,0 +1,14 @@
+[Unit]
+Description=Simple CGI Server
+After=nss-user-lookup.target
+Requires=fcgiwrap.socket
+
+[Service]
+Environment=DAEMON_OPTS=-f
+EnvironmentFile=-/etc/default/fcgiwrap
+ExecStart=/usr/sbin/fcgiwrap ${DAEMON_OPTS}
+User=ubuntu
+Group=ubuntu
+
+[Install]
+Also=fcgiwrap.socket
