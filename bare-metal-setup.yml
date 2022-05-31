@@ -1,30 +1,86 @@
 ---
 - name: Setup Playbook
-  hosts: sx-staging-bulk
+  hosts: sx-app-1
 
   tasks:
-    - name: Install NPM
+    - name: Install git 2.25
       become: yes
       apt:
-        name: npm
-        state: latest
+        name: git=*2.25.1*
+        update_cache: yes
+        state: present
 
-    - name: Install n
+    - name: Install zsh 5.8
+      become: yes
+      apt:
+        name: zsh=5.8*
+        update_cache: yes
+        state: present
+
+    - name: Set ZSH as default shell for user ubuntu
+      become: yes
+      shell: 
+        cmd: chsh -s $(which zsh) ubuntu
+
+    - name: Install NPM 6.14.4
+      become: yes
+      apt:
+        name: npm=6.14.4*
+        state: present
+
+    - name: Install n 8.2.0
       community.general.npm:
         name: n
         global: yes
         state: present
+        version: '8.2.0'
 
-    - name: Install pm2
+    - name: Install pm2 5.1.2
       community.general.npm:
-        name: n
+        name: pm2
         global: yes
         state: present
+        version: '5.1.2'
 
-    - name: Setup node version 16.15
+    - name: Setup node version 16.15 using n version manager
       become: yes
       shell:
         cmd: n 16.15
+
+    - name: Install certbot
+      apt:
+        become: yes
+        name: certbot=0.40.0*
+        state: present
+
+
+    # NGINX
+    # Only for App Servers - not required for API servers
+
+
+    - name: Install NGINX 1.18
+      apt:
+        name: nginx=1.18*
+        state: present
+
+    - name: Copy NGINX conf
+      ansible.builtin.copy:
+        src: /Users/karan/Documents/ansible-playbooks/auto-deployment/nginx-basic-http.conf
+        dest: /etc/nginx/sites-available/base.conf
+
+    - name: Create NGINX symbolic link 
+      file:
+        src: "/etc/nginx/sites-available/base.conf"
+        dest: "/etc/nginx/sites-enabled/base.conf"
+        state: link
+
+    - name: Delete default NGINX conf
+      file:
+        state: absent
+        path: /etc/nginx/sites-enabled/default
+
+    - name: Restart NGINX
+      service: name=nginx state=restarted enabled=yes
 
 
 

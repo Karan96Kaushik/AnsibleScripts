@@ -4,9 +4,9 @@
   become: yes
   tasks:
 
-    - name: Install NGINX
+    - name: Install NGINX 1.18
       apt:
-        name: nginx
+        name: nginx=1.18
         state: present
         # allow_downgrade: yes
 
@@ -48,10 +48,10 @@
     - name: Create cgi-bin dir
       shell: "chmod +x /home/ubuntu/scripts/cgi-bin/deploy.cgi"
 
-    - name: Delete default NGINX conf
-      file:
-        state: absent
-        path: /etc/nginx/sites-enabled/default
+    # - name: Delete default NGINX conf
+    #   file:
+    #     state: absent
+    #     path: /etc/nginx/sites-enabled/default
 
     - name: Restart NGINX
       service: name=nginx state=restarted enabled=yes
