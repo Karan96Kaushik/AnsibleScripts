@@ -1,12 +1,12 @@
 ---
 - name: Setup Playbook
-  hosts: sx-app-1
+  hosts: sx-api-1
   become: yes
 
   tasks:
     - name: Install git 2.25.1
       apt:
-        name: git=*2.25.1*
+        name: git=1:2.25.1*
         update_cache: yes
         state: present
 
@@ -64,29 +64,29 @@
     # Only for App Servers - not required for API servers
 
 
-    - name: Install NGINX 1.18
-      apt:
-        name: nginx=1.18*
-        state: present
+    # - name: Install NGINX 1.18
+    #   apt:
+    #     name: nginx=1.18*
+    #     state: present
 
-    - name: Copy NGINX conf
-      ansible.builtin.copy:
-        src: bare-metal/nginx-basic-http.conf
-        dest: /etc/nginx/sites-available/base.conf
+    # - name: Copy NGINX conf
+    #   ansible.builtin.copy:
+    #     src: bare-metal/nginx-basic-http.conf
+    #     dest: /etc/nginx/sites-available/base.conf
 
-    - name: Create NGINX symbolic link 
-      file:
-        src: "/etc/nginx/sites-available/base.conf"
-        dest: "/etc/nginx/sites-enabled/base.conf"
-        state: link
+    # - name: Create NGINX symbolic link 
+    #   file:
+    #     src: "/etc/nginx/sites-available/base.conf"
+    #     dest: "/etc/nginx/sites-enabled/base.conf"
+    #     state: link
 
-    - name: Delete default NGINX conf
-      file:
-        state: absent
-        path: /etc/nginx/sites-enabled/default
+    # - name: Delete default NGINX conf
+    #   file:
+    #     state: absent
+    #     path: /etc/nginx/sites-enabled/default
 
-    - name: Restart NGINX
-      service: name=nginx state=restarted enabled=yes
+    # - name: Restart NGINX
+    #   service: name=nginx state=restarted enabled=yes
 
 
 
