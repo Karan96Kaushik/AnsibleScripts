@@ -9,7 +9,10 @@
 1. Git
 1. NPM
 1. PM2
-1. NodeJS
 1. N (version manager)
+1. NodeJS
 1. ZSH
-1. 
+1. Oh-my-zsh
+1. Nginx
+1. Nginx - basic http config
+1. Certbot
