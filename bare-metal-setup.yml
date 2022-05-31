@@ -1,29 +1,37 @@
 ---
 - name: Setup Playbook
   hosts: sx-app-1
+  become: yes
 
   tasks:
-    - name: Install git 2.25
-      become: yes
+    - name: Install git 2.25.1
       apt:
         name: git=*2.25.1*
         update_cache: yes
         state: present
 
     - name: Install zsh 5.8
-      become: yes
       apt:
         name: zsh=5.8*
         update_cache: yes
         state: present
-
-    - name: Set ZSH as default shell for user ubuntu
+        
+    - name: Download oh-my-zsh
+      shell: touch install.sh && curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh > install.sh && echo "\nexit" >> install.sh && chmod +x install.sh 
+  
+    - name: Install oh-my-zsh
       become: yes
+      become_user: ubuntu
+      expect:
+        command: sh -c "RUNZSH=no ./install.sh" && rm install.sh
+        responses:
+          "~" : "exit\r"
+  
+    - name: Set ZSH as default shell for user ubuntu
       shell: 
         cmd: chsh -s $(which zsh) ubuntu
 
     - name: Install NPM 6.14.4
-      become: yes
       apt:
         name: npm=6.14.4*
         state: present
@@ -43,13 +51,11 @@
         version: '5.1.2'
 
     - name: Setup node version 16.15 using n version manager
-      become: yes
       shell:
         cmd: n 16.15
 
     - name: Install certbot
       apt:
-        become: yes
         name: certbot=0.40.0*
         state: present
 
@@ -65,7 +71,7 @@
 
     - name: Copy NGINX conf
       ansible.builtin.copy:
-        src: /Users/karan/Documents/ansible-playbooks/auto-deployment/nginx-basic-http.conf
+        src: bare-metal/nginx-basic-http.conf
         dest: /etc/nginx/sites-available/base.conf
 
     - name: Create NGINX symbolic link 
