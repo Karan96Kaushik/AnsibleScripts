@@ -1,0 +1,73 @@
+---
+- name: Setup Playbook
+  hosts: sx-api-2
+  become: yes
+
+  tasks:
+
+    - name: Copy SSH Key
+      ansible.builtin.copy:
+        src: repo/admin-pvt-ssh-key
+        dest: /home/ubuntu/.ssh/id_ed25519
+
+    - name: Copy Public SSH Key
+      ansible.builtin.copy:
+        src: repo/admin-pub-ssh-key
+        dest: /home/ubuntu/.ssh/id_ed25519.pub
+    
+    - name: Copy Environment
+      ansible.builtin.copy:
+        src: repo/environment
+        dest: /home/ubuntu/.profile
+
+    - name: Create aws dir
+      shell: "mkdir /home/ubuntu/.aws -p"
+    
+    - name: Copy AWS credentials
+      ansible.builtin.copy:
+        src: repo/aws-credentials
+        dest: /home/ubuntu/.aws/credentials
+  
+    - name: Source .profile by default
+      shell: 
+        cmd: echo "source /home/ubuntu/.profile" >> /home/ubuntu/.zshrc
+
+    - name: Clone repo
+      become: yes
+      become_user: ubuntu
+      expect:
+        command: git clone git@github.com:shyplite/sx-sellerapi.git 
+        responses:
+          "fingerprint" : "yes\r"
+      
+    - name: Clone DEV static repo as sx-static
+      become: yes
+      become_user: ubuntu
+      shell: git clone git@github.com:shyplite/sx-devstatic.git sx-static
+
+    - name: Checkout dev
+      become: yes
+      become_user: ubuntu
+      shell: cd /home/ubuntu/sx-sellerapi && git checkout dev && cd /home/ubuntu/sx-static && git checkout master
+
+    - name: Install packages based on package.json.
+      community.general.npm:
+        path: /home/ubuntu/sx-sellerapi
+        
+    - name: Source profile & Start app
+      become: yes
+      become_user: ubuntu
+      shell: |
+        . ~/.profile  
+        cd /home/ubuntu/ 
+        cd sx-sellerapi 
+        pm2_home="/home/ubuntu/.pm2" pm2 start bin/www --name api
+        
+    - name: Test api setup
+      shell: "sleep 3 && wget http://localhost:3100/ping"
+      register: command_output
+    - debug:
+        var: command_output.stdout_lines      
+
+
+
