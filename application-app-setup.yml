@@ -1,0 +1,84 @@
+---
+- name: Setup Playbook
+  hosts: sx-app-2
+  become: yes
+
+  tasks:
+
+    - name: Copy SSH Key
+      ansible.builtin.copy:
+        src: repo/admin-pvt-ssh-key
+        dest: /home/ubuntu/.ssh/id_ed25519
+
+    - name: Copy Public SSH Key
+      ansible.builtin.copy:
+        src: repo/admin-pub-ssh-key
+        dest: /home/ubuntu/.ssh/id_ed25519.pub
+
+    - name: Clone repo
+      become: yes
+      become_user: ubuntu
+      expect:
+        command: git clone git@github.com:shyplite/sx-app.git 
+        responses:
+          "fingerprint" : "yes\r"
+      
+    - name: Checkout dev
+      become: yes
+      become_user: ubuntu
+      shell: cd /home/ubuntu/sx-app && git checkout dev
+
+    - name: Install NGINX 1.18
+      apt:
+        name: nginx=1.18*
+        state: present
+
+    - name: Copy NGINX conf
+      ansible.builtin.copy:
+        src: bare-metal/nginx-basic-http.conf
+        dest: /etc/nginx/sites-available/base.conf
+
+    - name: Create NGINX symbolic link 
+      file:
+        src: "/etc/nginx/sites-available/base.conf"
+        dest: "/etc/nginx/sites-enabled/base.conf"
+        state: link
+
+    - name: Delete default NGINX conf
+      file:
+        state: absent
+        path: /etc/nginx/sites-enabled/default
+
+    - name: Restart NGINX
+      service: name=nginx state=restarted enabled=yes
+
+    - name: Setup node version 14.19 using n version manager - required for Vue packages
+      become: yes
+      shell:
+        cmd: n 14.19
+
+    - name: Install packages based on package.json.
+      community.general.npm:
+        path: /home/ubuntu/sx-app
+    
+    - name: Build
+      shell: |
+        cd /home/ubuntu/sx-app 
+        npm run build
+    
+    - name: Move dist folder
+      shell: |
+        rm -rf /home/ubuntu/sx-app/build
+        mv /home/ubuntu/sx-app/dist /home/ubuntu/sx-app/build
+
+    - name: Test app setup
+      shell: |
+        sleep 3 
+        wget http://localhost/index.html
+        rm index.html
+      register: command_output
+    - debug:
+        var: command_output.stdout_lines      
+
+
+
