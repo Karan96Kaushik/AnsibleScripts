@@ -1,6 +1,6 @@
 ---
 - name: Environment Update Playbook
-  hosts: sx-app-*
+  hosts: sx-api-*
   become: yes
 
   tasks:
@@ -9,6 +9,13 @@
       ansible.builtin.copy:
         src: application/environment-api
         dest: /home/ubuntu/.profile
+
+    - name: Replace Environment line
+      lineinfile: 
+        path: /home/ubuntu/.profile
+        regexp: '^(.*)export redisHOST=(.*)$' 
+        line: 'export redisHOST="172.16.0.25"'
+        backrefs: yes
 
     - name: Source profile & Start API
       become: yes
