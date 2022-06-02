@@ -1,0 +1,29 @@
+---
+- name: Environment Update Playbook
+  hosts: sx-app-*
+  become: yes
+
+  tasks:
+
+    - name: Copy Environment
+      ansible.builtin.copy:
+        src: application/environment.api
+        dest: /home/ubuntu/.profile
+
+    - name: Source profile & Start API
+      become: yes
+      become_user: ubuntu
+      shell: |
+        . ~/.profile  
+        cd /home/ubuntu/ 
+        cd sx-sellerapi 
+        pm2_home="/home/ubuntu/.pm2" pm2 restart api --update-env
+        
+    # - name: Test api setup
+    #   shell: "sleep 3 && wget http://localhost:3100/ping"
+    #   register: command_output
+    # - debug:
+    #     var: command_output.stdout_lines      
+
+
+

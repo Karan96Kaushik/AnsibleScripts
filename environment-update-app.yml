@@ -1,0 +1,40 @@
+---
+- name: Environment Update Playbook
+  hosts: sx-app-*
+  become: yes
+
+  tasks:
+
+    - name: Git Pull
+      become: yes
+      become_user: ubuntu
+      shell: |
+        . /home/ubuntu/.profile
+        cd /home/ubuntu/sx-app
+        git pull
+
+    - name: Copy Environment for vue
+      become: yes
+      become_user: ubuntu
+      ansible.builtin.copy:
+        src: application/environment.app
+        dest: /home/ubuntu/sx-app/.env
+
+    - name: Copy Environment for vue
+      become: yes
+      become_user: ubuntu
+      ansible.builtin.copy:
+        src: application/environment.app
+        dest: /home/ubuntu/sx-app/.env.production
+
+    - name: Build and move APP files
+      become: yes
+      become_user: ubuntu
+      shell: |
+        . /home/ubuntu/.profile
+        cd /home/ubuntu/sx-app
+        npm ci
+        npm run build
+        cp -r dist ../sx-app-build
+
+

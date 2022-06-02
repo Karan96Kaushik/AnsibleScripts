@@ -55,7 +55,11 @@
     - name: Checkout dev
       become: yes
       become_user: ubuntu
-      shell: cd /home/ubuntu/sx-sellerapi && git checkout dev && cd /home/ubuntu/sx-static && git checkout master
+      shell: |
+        cd /home/ubuntu/sx-sellerapi 
+        git checkout dev 
+        cd /home/ubuntu/sx-static 
+        git checkout master
 
     - name: Install packages based on package.json.
       community.general.npm:
