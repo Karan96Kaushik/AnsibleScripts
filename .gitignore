@@ -1,6 +1,6 @@
 application/admin-pvt-ssh-key
 application/admin-pub-ssh-key
-application/environment.api
-application/environment.app
+application/environment-api
+application/environment-app
 application/environment
 application/aws-credentials

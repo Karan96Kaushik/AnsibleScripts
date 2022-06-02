@@ -24,7 +24,7 @@
       become: yes
       become_user: ubuntu
       ansible.builtin.copy:
-        src: application/environment.app
+        src: application/environment-app
         dest: /home/ubuntu/sx-app/.env.production
 
     - name: Build and move APP files
