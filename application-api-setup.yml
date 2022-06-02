@@ -1,9 +1,16 @@
 ---
-- name: Setup Playbook
+- name: API Setup Playbook
   hosts: sx-api-2
   become: yes
 
   tasks:
+
+    - name: Install pm2 5.1.2
+      community.general.npm:
+        name: pm2
+        global: yes
+        state: present
+        version: '5.1.2'
 
     - name: Copy SSH Key
       ansible.builtin.copy:

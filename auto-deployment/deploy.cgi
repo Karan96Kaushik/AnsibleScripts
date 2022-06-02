@@ -40,17 +40,15 @@ echo '<body>'
 
 ## SX-APP
 
-# cd /home/ubuntu/sx-app
-# git reset --hard
-# git checkout -f dev
-# git pull
+cd /home/ubuntu/sx-app
+git reset --hard
+git checkout -f dev
+git pull
 
-# cd /home/ubuntu/sx-app
+npm install
+npm run build
 
-# /usr/local/bin/npm install
-# /usr/local/bin/npm run build
-
-# cp -r /home/ubuntu/slv/app/dist /home/ubuntu/
+cp -r /home/ubuntu/sx-app/dist /home/ubuntu/sx-app-build
 
 echo '</body>'
 echo '</html>'

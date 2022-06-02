@@ -1,6 +1,6 @@
 ---
-- name: Setup Playbook
-  hosts: sx-app-2
+- name: App Setup Playbook
+  hosts: sx-app-1
   become: yes
 
   tasks:
@@ -68,8 +68,7 @@
     
     - name: Move dist folder
       shell: |
-        rm -rf /home/ubuntu/sx-app/build
-        mv /home/ubuntu/sx-app/dist /home/ubuntu/sx-app/build
+        cp -r /home/ubuntu/sx-app/dist /home/ubuntu/sx-app-build
 
     - name: Test app setup
       shell: |

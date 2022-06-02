@@ -1,4 +1,4 @@
-repo/admin-pvt-ssh-key
-repo/admin-pub-ssh-key
-repo/environment
-repo/aws-credentials
+application/admin-pvt-ssh-key
+application/admin-pub-ssh-key
+application/environment
+application/aws-credentials

@@ -1,6 +1,6 @@
 ---
-- name: Setup Playbook
-  hosts: sx-api-1
+- name: Bare Metal Setup Playbook
+  hosts: sx-staging-app
   become: yes
 
   tasks:
@@ -30,6 +30,11 @@
     - name: Set ZSH as default shell for user ubuntu
       shell: 
         cmd: chsh -s $(which zsh) ubuntu
+  
+    - name: Setup remote sublime
+      shell: |
+        wget -O /usr/local/bin/subl \https://raw.github.com/aurora/rmate/master/rmate
+        chmod a+x /usr/local/bin/subl
 
     - name: Install NPM 6.14.4
       apt:
@@ -43,26 +48,18 @@
         state: present
         version: '8.2.0'
 
-    - name: Install pm2 5.1.2
-      community.general.npm:
-        name: pm2
-        global: yes
-        state: present
-        version: '5.1.2'
-
     - name: Setup node version 16.15 using n version manager
       shell:
         cmd: n 16.15
 
-    - name: Install certbot
-      apt:
-        name: certbot=0.40.0*
-        state: present
-
-
+    # -- DEPRECATED --
     # NGINX
     # Only for App Servers - not required for API servers
 
+    # - name: Install certbot
+    #   apt:
+    #     name: certbot=0.40.0*
+    #     state: present
 
     # - name: Install NGINX 1.18
     #   apt:

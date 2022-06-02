@@ -1,12 +1,12 @@
 ---
 - name: Auto-Deployment Playbook
-  hosts: sx-staging-bulk
+  hosts: sx-staging-app
   become: yes
   tasks:
 
     - name: Install NGINX 1.18
       apt:
-        name: nginx=1.18
+        name: nginx=*1.18*
         state: present
         # allow_downgrade: yes
 
