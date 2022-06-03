@@ -48,6 +48,7 @@ git pull
 npm install
 npm run build
 
+rm -rf /home/ubuntu/sx-app-build
 cp -r /home/ubuntu/sx-app/dist /home/ubuntu/sx-app-build
 
 echo '</body>'
