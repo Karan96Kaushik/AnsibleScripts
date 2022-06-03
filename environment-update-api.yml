@@ -2,7 +2,10 @@
 - name: Environment Update Playbook
   hosts: sx-api-*
   become: yes
-
+  vars:
+      update_env: 
+        "redisHOST": "172.16.0.25"
+        "redisPORT": "6379"
   tasks:
 
     - name: Copy Environment
@@ -13,9 +16,9 @@
     - name: Replace Environment line
       lineinfile: 
         path: /home/ubuntu/.profile
-        regexp: '^(.*)export redisHOST=(.*)$' 
-        line: 'export redisHOST="172.16.0.25"'
-        backrefs: yes
+        regexp: '^(.*)export {{ item.key }}=(.*)$' 
+        line: 'export {{ item.key }}="{{ item.value }}"'
+      loop: "{{ update_env | dict2items }}"
 
     - name: Source profile & Start API
       become: yes
@@ -28,9 +31,17 @@
         
     # - name: Test api setup
     #   shell: "sleep 3 && wget http://localhost:3100/ping"
-    #   register: command_output
+    #   register: command_output_test
     # - debug:
-    #     var: command_output.stdout_lines      
+    #     var: command_output_test.stdout_lines      
+        
+    - name: Get log
+      become: yes
+      become_user: ubuntu
+      shell: "pm2 log api --nostream"
+      register: command_output
+    - debug:
+        var: command_output.stdout_lines      
 
 
 
