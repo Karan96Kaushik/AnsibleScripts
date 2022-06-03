@@ -1,7 +1,18 @@
 ---
-- name: API Setup Playbook
-  hosts: sx-api-2
+- name: API/HQ Setup Playbook
+  hosts: sx-admin-1
   become: yes
+
+  vars:
+    repo_name: "sx-admin"
+    deployment_branch: "teststaging"
+    static_branch: "master"
+    static_repo_name: "sx-devstatic"
+
+    # repo_name: "sx-sellerapi"
+    # deployment_branch: "dev"
+    # static_branch: "master"
+    # static_repo_name: "sx-devstatic"
 
   tasks:
 
@@ -14,17 +25,17 @@
 
     - name: Copy SSH Key
       ansible.builtin.copy:
-        src: repo/admin-pvt-ssh-key
+        src: application/admin-pvt-ssh-key
         dest: /home/ubuntu/.ssh/id_ed25519
 
     - name: Copy Public SSH Key
       ansible.builtin.copy:
-        src: repo/admin-pub-ssh-key
+        src: application/admin-pub-ssh-key
         dest: /home/ubuntu/.ssh/id_ed25519.pub
     
     - name: Copy Environment
       ansible.builtin.copy:
-        src: repo/environment
+        src: application/environment
         dest: /home/ubuntu/.profile
 
     - name: Create aws dir
@@ -32,7 +43,7 @@
     
     - name: Copy AWS credentials
       ansible.builtin.copy:
-        src: repo/aws-credentials
+        src: application/aws-credentials
         dest: /home/ubuntu/.aws/credentials
   
     - name: Source .profile by default
@@ -43,27 +54,27 @@
       become: yes
       become_user: ubuntu
       expect:
-        command: git clone git@github.com:shyplite/sx-sellerapi.git 
+        command: git clone git@github.com:shyplite/sx-admin.git 
         responses:
           "fingerprint" : "yes\r"
       
-    - name: Clone DEV static repo as sx-static
+    - name: Clone {{ static_repo_name }} {{ static_branch }} as sx-static
       become: yes
       become_user: ubuntu
-      shell: git clone git@github.com:shyplite/sx-devstatic.git sx-static
+      shell: git clone git@github.com:shyplite/{{ static_repo_name }}.git sx-static
 
-    - name: Checkout dev
+    - name: Checkout {{ deployment_branch }}
       become: yes
       become_user: ubuntu
       shell: |
-        cd /home/ubuntu/sx-sellerapi 
-        git checkout dev 
+        cd /home/ubuntu/{{ repo_name }}
+        git checkout {{ deployment_branch }} 
         cd /home/ubuntu/sx-static 
-        git checkout master
-
+        git checkout {{ static_branch }}
+        
     - name: Install packages based on package.json.
       community.general.npm:
-        path: /home/ubuntu/sx-sellerapi
+        path: /home/ubuntu/{{ repo_name }}
         
     - name: Source profile & Start app
       become: yes
@@ -71,8 +82,14 @@
       shell: |
         . ~/.profile  
         cd /home/ubuntu/ 
-        cd sx-sellerapi 
-        pm2_home="/home/ubuntu/.pm2" pm2 start bin/www --name api
+        cd {{ repo_name }}
+        pm2_home="/home/ubuntu/.pm2" pm2 start bin/www --name admin
+        
+    - name: Get log
+      shell: "sleep 3 && pm2 log admin --nostream"
+      register: command_output_log
+    - debug:
+        var: command_output_log.stdout_lines      
         
     - name: Test api setup
       shell: "sleep 3 && wget http://localhost:3100/ping"

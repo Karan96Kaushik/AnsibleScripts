@@ -1,11 +1,14 @@
 ---
 - name: Environment Update Playbook
-  hosts: sx-api-*
+  hosts: sx-admin-*
   become: yes
   vars:
+      repo_name: "admin"
+      # repo_name: "api"
       update_env: 
-        "redisHOST": "172.16.0.25"
+        "redisHOST": "172.31.14.208"
         "redisPORT": "6379"
+        "redisPASS": "redis123"
   tasks:
 
     - name: Copy Environment
@@ -26,8 +29,7 @@
       shell: |
         . ~/.profile  
         cd /home/ubuntu/ 
-        cd sx-sellerapi 
-        pm2_home="/home/ubuntu/.pm2" pm2 restart api --update-env
+        pm2_home="/home/ubuntu/.pm2" pm2 restart {{ repo_name }} --update-env
         
     # - name: Test api setup
     #   shell: "sleep 3 && wget http://localhost:3100/ping"
@@ -38,7 +40,7 @@
     - name: Get log
       become: yes
       become_user: ubuntu
-      shell: "pm2 log api --nostream"
+      shell: "pm2 log {{ repo_name }} --nostream"
       register: command_output
     - debug:
         var: command_output.stdout_lines      

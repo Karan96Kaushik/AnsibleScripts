@@ -1,6 +1,6 @@
 ---
 - name: Bare Metal Setup Playbook
-  hosts: sx-staging-app
+  hosts: sx-test-prod-redis
   become: yes
 
   tasks:
