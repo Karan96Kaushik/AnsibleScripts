@@ -39,7 +39,7 @@
       shell: 
         cmd: echo "source /home/ubuntu/.profile" >> /home/ubuntu/.zshrc
 
-    - name: Clone repo
+    - name: Clone repo (also adds github SSH fingerpring if prompted)
       become: yes
       become_user: ubuntu
       expect:

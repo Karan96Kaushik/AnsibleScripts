@@ -15,7 +15,7 @@
         src: repo/admin-pub-ssh-key
         dest: /home/ubuntu/.ssh/id_ed25519.pub
 
-    - name: Clone repo
+    - name: Clone repo (also adds github SSH fingerpring if prompted)
       become: yes
       become_user: ubuntu
       expect:
