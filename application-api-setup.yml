@@ -1,20 +1,23 @@
 ---
 - name: API/HQ Setup Playbook
-  hosts: sx-admin-1
+  hosts: sx-bulk*
   become: yes
 
   vars:
-    repo_name: "sx-admin"
-    deployment_branch: "teststaging"
-    static_branch: "master"
+    static_branch: "ProdTest"
     static_repo_name: "sx-devstatic"
-    app_name: "admin"
+
+    # repo_name: "sx-admin"
+    # deployment_branch: "teststaging"
+    # app_name: "admin"
 
     # repo_name: "sx-sellerapi"
     # deployment_branch: "dev"
-    # static_branch: "master"
-    # static_repo_name: "sx-devstatic"
     # app_name: "api"
+
+    repo_name: "sx-bulkupload"
+    deployment_branch: "dev"
+    app_name: "bulkupload"
 
   tasks:
 
@@ -52,11 +55,11 @@
       shell: 
         cmd: echo "source /home/ubuntu/.profile" >> /home/ubuntu/.zshrc
 
-    - name: Clone repo (also adds github SSH fingerpring if prompted)
+    - name: Clone {{ repo_name }} repo on {{ deployment_branch }} branch (also adds github SSH fingerpring if prompted)
       become: yes
       become_user: ubuntu
       expect:
-        command: git clone git@github.com:shyplite/sx-admin.git 
+        command: git clone git@github.com:shyplite/{{ repo_name }}.git 
         responses:
           "fingerprint" : "yes\r"
       

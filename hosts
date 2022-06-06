@@ -3,6 +3,7 @@ sx-staging-bulk
 
 sx-app-1
 sx-app-2
+
 sx-api-1
 sx-api-2
 
@@ -11,3 +12,5 @@ sx-admin-1
 sx-test-prod-redis
 
 sx-staging-app
+
+sx-bulkupload

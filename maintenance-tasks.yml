@@ -1,0 +1,33 @@
+---
+- name: Maintenance Playbook
+  # hosts: sx-api*
+  # hosts: sx-admin*
+  # hosts: sx-bulk*
+  hosts: sx-bulk*, sx-api*, sx-admin*
+
+  become: yes
+  vars:
+    # app_name: "api"
+    # app_name: "admin"
+    # app_name: "bulkupload"
+  tasks:
+
+    - name: List
+      become: yes
+      become_user: ubuntu
+      shell: |
+        pm2 list
+      register: command_output
+    - debug:
+        var: command_output.stdout_lines    
+
+    # - name: Restart
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: |
+    #     pm2 restart all
+    #   register: command_output
+    # - debug:
+    #     var: command_output.stdout_lines    
+        
+

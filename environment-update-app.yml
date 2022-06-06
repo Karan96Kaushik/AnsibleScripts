@@ -3,7 +3,27 @@
   hosts: sx-app-*
   become: yes
 
+  vars:
+      update_env: 
+        # "redisHOST": "172.31.14.208"
+        # "redisPORT": "6379"
+        # "redisPASS": "redis123"
+        # "PORT": "2100"
+        "NODE_ENV": "production"
+
   tasks:
+
+    - name: Copy Environment
+      ansible.builtin.copy:
+        src: application/environment-api
+        dest: /home/ubuntu/.profile
+
+    - name: Replace Environment line
+      lineinfile: 
+        path: /home/ubuntu/.profile
+        regexp: '^(.*)export {{ item.key }}=(.*)$' 
+        line: 'export {{ item.key }}="{{ item.value }}"'
+      loop: "{{ update_env | dict2items }}"
 
     - name: Git Pull
       become: yes
@@ -11,13 +31,14 @@
       shell: |
         . /home/ubuntu/.profile
         cd /home/ubuntu/sx-app
-        git pull
+        git stash
+        git pull -f
 
     - name: Copy Environment for vue
       become: yes
       become_user: ubuntu
       ansible.builtin.copy:
-        src: application/environment.app
+        src: application/environment-app
         dest: /home/ubuntu/sx-app/.env
 
     - name: Copy Environment for vue
@@ -35,6 +56,7 @@
         cd /home/ubuntu/sx-app
         npm ci
         npm run build
+        rm -rf /home/ubuntu/sx-app-build
         cp -r dist ../sx-app-build
 
 

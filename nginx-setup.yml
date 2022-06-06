@@ -2,27 +2,35 @@
 - name: NGINX Setup Playbook
   hosts: sx-admin-1
   become: yes
+  vars:
+    server_type: "reverse-proxy"
+    server_type: "static-files"
 
   tasks:
 
-    - name: Install certbot
-      apt:
-        name: certbot=0.40.0*
-        state: present
+    # - name: Install certbot
+    #   apt:
+    #     name: certbot=0.40.0*
+    #     state: present
+
+    # - name: Install certbot-nginx
+    #   apt:
+    #     name: python3-certbot-nginx
+    #     state: present
+
+    # - name: Generate and Install certificate
+    #   become: yes
+    #   shell: |
+    #     certbot --nginx -d hq1.shypmax.com
 
     - name: Install NGINX 1.18
       apt:
         name: nginx=1.18*
         state: present
 
-    - name: Copy NGINX conf - reverse proxy
+    - name: Copy NGINX conf - {{ server_type }}
       ansible.builtin.copy:
-        src: bare-metal/nginx-reverse-proxy-http.conf
-        dest: /etc/nginx/sites-available/base.conf
-
-    - name: Copy NGINX conf - static files server
-      ansible.builtin.copy:
-        src: bare-metal/nginx-basic-http.conf
+        src: bare-metal/nginx-{{ server_type }}-http.conf
         dest: /etc/nginx/sites-available/base.conf
 
     - name: Create NGINX symbolic link 

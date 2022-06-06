@@ -1,12 +1,12 @@
 ---
 - name: Auto-Deployment Playbook
-  hosts: sx-staging-app
+  hosts: sx-app-*
   become: yes
   tasks:
 
     - name: Install NGINX 1.18
       apt:
-        name: nginx=*1.18*
+        name: nginx=1.18*
         state: present
         # allow_downgrade: yes
 
@@ -21,10 +21,9 @@
         dest: /lib/systemd/system/fcgiwrap.service
 
     - name: Restart FCGI as ubuntu
-      shell: "systemctl daemon-reload"
-
-    - name: Restart FCGI as ubuntu
-      shell: "systemctl restart fcgiwrap.service"
+      shell: |
+        systemctl daemon-reload
+        systemctl restart fcgiwrap.service
 
     - name: Copy NGINX conf
       ansible.builtin.copy:
@@ -57,7 +56,10 @@
       service: name=nginx state=restarted enabled=yes
         
     - name: Test auto deployment setup
-      shell: "wget http://localhost:8090/cgi-bin/deploy.cgi && cat deploy.cgi && rm deploy.cgi"
+      shell: |
+        wget http://localhost:8090/cgi-bin/deploy.cgi 
+        cat deploy.cgi 
+        rm deploy.cgi"
       register: command_output
     - debug:
         var: command_output.stdout_lines

@@ -35,7 +35,7 @@
 
     - name: Copy NGINX conf
       ansible.builtin.copy:
-        src: bare-metal/nginx-basic-http.conf
+        src: bare-metal/nginx-static-files-http.conf
         dest: /etc/nginx/sites-available/base.conf
 
     - name: Create NGINX symbolic link 

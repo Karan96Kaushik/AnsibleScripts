@@ -1,6 +1,6 @@
 ---
 - name: Bare Metal Setup Playbook
-  hosts: sx-admin-1
+  hosts: sx-bulk*
   become: yes
 
   tasks:

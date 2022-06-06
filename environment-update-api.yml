@@ -1,16 +1,25 @@
 ---
 - name: Environment Update Playbook
-  hosts: sx-admin-*
+  hosts: sx-api*
   become: yes
   vars:
-      repo_name: "admin"
-      # repo_name: "api"
+      # app_name: "bulkupload"
+      # app_name: "admin"
+      app_name: "api"
+
+      # repo_dir_name: "sx-static"
+      repo_dir_name: "sx-sellerapi"
+      # repo_dir_name: "sx-bulkupload"
+      # repo_dir_name: "sx-admin"
+
+      branch_name: "dev"
+      # branch_name: "teststaging"
+      # branch_name: "ProdTest"
       
       update_env: 
-        "redisHOST": "172.31.14.208"
-        "redisPORT": "6379"
-        "redisPASS": "redis123"
-        "PORT": "2100"
+        # "redisHOST": "172.31.14.208"
+        # "redisPORT": "6379"
+        # "redisPASS": "redis123"
   tasks:
 
     # - name: Copy Environment
@@ -22,7 +31,7 @@
       lineinfile: 
         path: /home/ubuntu/.profile
         regexp: '^(.*)export {{ item.key }}=(.*)$' 
-        line: 'export {{ item.key }}="{{ item.value }}"'
+        line: "export {{ item.key }}='{{ item.value }}'"
       loop: "{{ update_env | dict2items }}"
 
     - name: Source profile & Start API
@@ -30,19 +39,22 @@
       become_user: ubuntu
       shell: |
         . ~/.profile  
-        cd /home/ubuntu/ 
-        pm2_home="/home/ubuntu/.pm2" pm2 restart {{ repo_name }} --update-env
+        cd /home/ubuntu/{{ repo_dir_name }}
+        git pull
+        git checkout {{ branch_name }}
+        pm2_home="/home/ubuntu/.pm2" pm2 restart {{ app_name }} --update-env
         
     # - name: Test api setup
     #   shell: "sleep 3 && wget http://localhost:3100/ping"
     #   register: command_output_test
     # - debug:
     #     var: command_output_test.stdout_lines      
-        
+
     - name: Get log
       become: yes
       become_user: ubuntu
-      shell: "pm2 log {{ repo_name }} --nostream"
+      shell: |
+        pm2_home="/home/ubuntu/.pm2/" pm2 log {{ app_name }} --nostream
       register: command_output
     - debug:
         var: command_output.stdout_lines      
