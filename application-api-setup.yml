@@ -8,11 +8,13 @@
     deployment_branch: "teststaging"
     static_branch: "master"
     static_repo_name: "sx-devstatic"
+    app_name: "admin"
 
     # repo_name: "sx-sellerapi"
     # deployment_branch: "dev"
     # static_branch: "master"
     # static_repo_name: "sx-devstatic"
+    # app_name: "api"
 
   tasks:
 
@@ -83,16 +85,16 @@
         . ~/.profile  
         cd /home/ubuntu/ 
         cd {{ repo_name }}
-        pm2_home="/home/ubuntu/.pm2" pm2 start bin/www --name admin
+        pm2_home="/home/ubuntu/.pm2" pm2 start bin/www --name {{ app_name }}
         
     - name: Get log
-      shell: "sleep 3 && pm2 log admin --nostream"
+      shell: "sleep 3 && pm2 log {{ app_name }} --nostream"
       register: command_output_log
     - debug:
         var: command_output_log.stdout_lines      
         
     - name: Test api setup
-      shell: "sleep 3 && wget http://localhost:3100/ping"
+      shell: "sleep 3 && wget http://localhost:2100/ping"
       register: command_output
     - debug:
         var: command_output.stdout_lines      

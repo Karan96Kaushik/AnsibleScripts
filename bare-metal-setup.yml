@@ -1,6 +1,6 @@
 ---
 - name: Bare Metal Setup Playbook
-  hosts: sx-test-prod-redis
+  hosts: sx-admin-1
   become: yes
 
   tasks:
@@ -66,7 +66,12 @@
     #     name: nginx=1.18*
     #     state: present
 
-    # - name: Copy NGINX conf
+    # - name: Copy NGINX conf - reverse proxy
+    #   ansible.builtin.copy:
+    #     src: bare-metal/nginx-reverse-proxy-http.conf
+    #     dest: /etc/nginx/sites-available/base.conf
+
+    # - name: Copy NGINX conf - static files server
     #   ansible.builtin.copy:
     #     src: bare-metal/nginx-basic-http.conf
     #     dest: /etc/nginx/sites-available/base.conf

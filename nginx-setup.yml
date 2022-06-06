@@ -1,0 +1,40 @@
+---
+- name: NGINX Setup Playbook
+  hosts: sx-admin-1
+  become: yes
+
+  tasks:
+
+    - name: Install certbot
+      apt:
+        name: certbot=0.40.0*
+        state: present
+
+    - name: Install NGINX 1.18
+      apt:
+        name: nginx=1.18*
+        state: present
+
+    - name: Copy NGINX conf - reverse proxy
+      ansible.builtin.copy:
+        src: bare-metal/nginx-reverse-proxy-http.conf
+        dest: /etc/nginx/sites-available/base.conf
+
+    - name: Copy NGINX conf - static files server
+      ansible.builtin.copy:
+        src: bare-metal/nginx-basic-http.conf
+        dest: /etc/nginx/sites-available/base.conf
+
+    - name: Create NGINX symbolic link 
+      file:
+        src: "/etc/nginx/sites-available/base.conf"
+        dest: "/etc/nginx/sites-enabled/base.conf"
+        state: link
+
+    - name: Delete default NGINX conf
+      file:
+        state: absent
+        path: /etc/nginx/sites-enabled/default
+
+    - name: Restart NGINX
+      service: name=nginx state=restarted enabled=yes

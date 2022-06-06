@@ -5,16 +5,18 @@
   vars:
       repo_name: "admin"
       # repo_name: "api"
+      
       update_env: 
         "redisHOST": "172.31.14.208"
         "redisPORT": "6379"
         "redisPASS": "redis123"
+        "PORT": "2100"
   tasks:
 
-    - name: Copy Environment
-      ansible.builtin.copy:
-        src: application/environment-api
-        dest: /home/ubuntu/.profile
+    # - name: Copy Environment
+    #   ansible.builtin.copy:
+    #     src: application/environment-api
+    #     dest: /home/ubuntu/.profile
 
     - name: Replace Environment line
       lineinfile: 
