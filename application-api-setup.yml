@@ -1,11 +1,11 @@
 ---
 - name: API/HQ Setup Playbook
-  hosts: sx-bulk*
+  hosts: im-admin
   become: yes
 
   vars:
-    static_branch: "ProdTest"
-    static_repo_name: "sx-devstatic"
+    static_branch: "master"
+    static_repo_name: "im-static"
 
     # repo_name: "sx-admin"
     # deployment_branch: "teststaging"
@@ -15,9 +15,11 @@
     # deployment_branch: "dev"
     # app_name: "api"
 
-    repo_name: "sx-bulkupload"
-    deployment_branch: "dev"
-    app_name: "bulkupload"
+    repo_name: "im-notification"
+    deployment_branch: "main"
+    app_name: "notification-prod"
+
+    port: 4000
 
   tasks:
 
@@ -40,7 +42,7 @@
     
     - name: Copy Environment
       ansible.builtin.copy:
-        src: application/environment
+        src: application/environment-api
         dest: /home/ubuntu/.profile
 
     - name: Create aws dir
@@ -66,7 +68,7 @@
     - name: Clone {{ static_repo_name }} {{ static_branch }} as sx-static
       become: yes
       become_user: ubuntu
-      shell: git clone git@github.com:shyplite/{{ static_repo_name }}.git sx-static
+      shell: git clone git@github.com:shyplite/{{ static_repo_name }}.git {{ static_repo_name }}
 
     - name: Checkout {{ deployment_branch }}
       become: yes
@@ -74,7 +76,12 @@
       shell: |
         cd /home/ubuntu/{{ repo_name }}
         git checkout {{ deployment_branch }} 
-        cd /home/ubuntu/sx-static 
+
+    - name: Checkout {{ static_branch }}
+      become: yes
+      become_user: ubuntu
+      shell: |
+        cd /home/ubuntu/{{ static_repo_name }}
         git checkout {{ static_branch }}
         
     - name: Install packages based on package.json.
@@ -97,7 +104,9 @@
         var: command_output_log.stdout_lines      
         
     - name: Test api setup
-      shell: "sleep 3 && wget http://localhost:2100/ping"
+      shell: |
+        sleep 3 
+        wget http://localhost:{{ port }}/
       register: command_output
     - debug:
         var: command_output.stdout_lines      
