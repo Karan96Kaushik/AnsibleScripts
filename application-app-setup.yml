@@ -1,32 +1,42 @@
 ---
 - name: App Setup Playbook
-  hosts: sx-app-1
+  hosts: im-warehouse
   become: yes
+
+  vars:
+    
+    repo_name: "im_warehouse"
+    # repo_name: "sx-app"
+
+    app_path: "im_warehouse/client"
+    # app_path: "sx-app"
 
   tasks:
 
     - name: Copy SSH Key
       ansible.builtin.copy:
-        src: repo/admin-pvt-ssh-key
+        src: application/admin-pvt-ssh-key
         dest: /home/ubuntu/.ssh/id_ed25519
 
     - name: Copy Public SSH Key
       ansible.builtin.copy:
-        src: repo/admin-pub-ssh-key
+        src: application/admin-pub-ssh-key
         dest: /home/ubuntu/.ssh/id_ed25519.pub
 
     - name: Clone repo (also adds github SSH fingerpring if prompted)
       become: yes
       become_user: ubuntu
       expect:
-        command: git clone git@github.com:shyplite/sx-app.git 
+        command: git clone git@github.com:shyplite/{{ repo_name }}.git 
         responses:
           "fingerprint" : "yes\r"
       
     - name: Checkout dev
       become: yes
       become_user: ubuntu
-      shell: cd /home/ubuntu/sx-app && git checkout dev
+      shell: cd /home/ubuntu/ 
+
+      #&& git checkout dev
 
     - name: Install NGINX 1.18
       apt:
@@ -59,16 +69,16 @@
 
     - name: Install packages based on package.json.
       community.general.npm:
-        path: /home/ubuntu/sx-app
+        path: /home/ubuntu/{{ app_path }} 
     
     - name: Build
       shell: |
-        cd /home/ubuntu/sx-app 
+        cd /home/ubuntu/{{ app_path }}
         npm run build
     
     - name: Move dist folder
       shell: |
-        cp -r /home/ubuntu/sx-app/dist /home/ubuntu/sx-app-build
+        cp -r /home/ubuntu/{{ app_path }}/dist /home/ubuntu/{{ repo_name }}-app-build
 
     - name: Test app setup
       shell: |
