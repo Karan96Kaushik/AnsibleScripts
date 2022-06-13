@@ -1,6 +1,6 @@
 ---
 - name: Bare Metal Setup Playbook
-  hosts: sx-bulk*
+  hosts: im-warehouse # shypstation
   become: yes
 
   tasks:
@@ -16,8 +16,16 @@
         update_cache: yes
         state: present
         
+    - name: Setup SWAP memory
+      shell: |
+        fallocate -l 1G /swapfile
+        dd if=/dev/zero of=/swapfile bs=1024 count=1048576
+        chmod 600 /swapfile
+        /sbin/mkswap /swapfile
+        swapon /swapfile
+
     - name: Download oh-my-zsh
-      shell: touch install.sh && curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh > install.sh && echo "\nexit" >> install.sh && chmod +x install.sh 
+      shell: touch install.sh && wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh > install.sh && chmod +x install.sh 
   
     - name: Install oh-my-zsh
       become: yes
@@ -35,7 +43,7 @@
       shell: |
         wget -O /usr/local/bin/subl \https://raw.github.com/aurora/rmate/master/rmate
         chmod a+x /usr/local/bin/subl
-
+  
     - name: Install NPM 6.14.4
       apt:
         name: npm=6.14.4*
