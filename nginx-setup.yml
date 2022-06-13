@@ -1,10 +1,10 @@
 ---
 - name: NGINX Setup Playbook
-  hosts: im-warehouse
+  hosts: im-admin
   become: yes
   vars:
     server_type: "reverse-proxy"
-    server_type: "static-files"
+    # server_type: "static-files"
 
   tasks:
 
@@ -22,16 +22,6 @@
       apt:
         name: nginx=1.18*
         state: present
-
-    - name: Generate and Install certificate
-      expect:
-        command: certbot --nginx -d warehouse.importee.club
-        responses:
-          'and security notices' : "karan@shyplite.com\r"
-          'gree' : "A\r"
-          'es' : "N\r"
-          'Select the appropriate number' : "2\r"
-          'press "c" to cancel' : "2\r"
 
     - name: Copy NGINX conf - {{ server_type }}
       ansible.builtin.copy:
@@ -51,3 +41,13 @@
 
     - name: Restart NGINX
       service: name=nginx state=restarted enabled=yes
+
+    - name: Generate and Install certificate
+      expect:
+        command: certbot --nginx -d hq.importee.club
+        responses:
+          'and security notices' : "karan@shyplite.com\r"
+          'gree' : "A\r"
+          'es' : "N\r"
+          'Select the appropriate number' : "2\r"
+          'press "c" to cancel' : "2\r"
