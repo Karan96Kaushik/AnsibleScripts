@@ -1,5 +1,11 @@
+shypstation
 sx-staging
+
 sx-staging-bulk
+
+sx-staging-app
+
+sx-staging-hq
 
 sx-app-1
 sx-app-2
@@ -9,8 +15,12 @@ sx-api-2
 
 sx-admin-1
 
+sx-bulkupload
+
 sx-test-prod-redis
 
-sx-staging-app
+im-warehouse-staging
 
-sx-bulkupload
+im-api
+im-admin
+im-warehouse
