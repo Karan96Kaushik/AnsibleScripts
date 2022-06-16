@@ -46,8 +46,8 @@
       expect:
         command: certbot --nginx -d hq.importee.club
         responses:
-          'and security notices' : "karan@shyplite.com\r"
-          'gree' : "A\r"
-          'es' : "N\r"
+          '"(used for urgent renewal and security notices)"' : "karan@shyplite.com\r"
+          '"(A)gree/(C)ancel"' : "A\r"
+          '"(Y)es/(N)o"' : "N\r"
           'Select the appropriate number' : "2\r"
           'press "c" to cancel' : "2\r"
