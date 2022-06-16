@@ -59,7 +59,7 @@
       shell: |
         wget http://localhost:8090/cgi-bin/deploy.cgi 
         cat deploy.cgi 
-        rm deploy.cgi"
+        rm deploy.cgi
       register: command_output
     - debug:
         var: command_output.stdout_lines
