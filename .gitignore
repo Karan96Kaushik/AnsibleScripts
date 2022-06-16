@@ -1,5 +1,6 @@
 application/admin-pvt-ssh-key
 application/admin-pub-ssh-key
+application/environment-im*
 application/environment-api
 application/environment-app
 application/environment
