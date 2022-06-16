@@ -17,20 +17,24 @@ echo '<body>'
 
 ## SX API/HQ
 
-# app_name=api
-# repo_name=sellerapi
+##################
+# app_name=admin
+# repo_name=sx-admin
 # branch_name=dev
+# static_repo=sx-static
+# static_branch_name=master
+##################
 
 # echo '-----------------------------------'
 # echo 'pulling static updates'
-# cd /home/ubuntu/sx-static
+# cd /home/ubuntu/$static_repo
 # # git reset --hard
-# # git checkout -f dev
+# # git checkout -f $static_branch_name
 # git pull
 
 # echo '-----------------------------------'
 # echo 'pulling application updates'
-# cd /home/ubuntu/sx-$repo_name
+# cd /home/ubuntu/$repo_name
 # # git reset --hard
 # # git checkout -f $branch_name
 # git pull
@@ -50,26 +54,34 @@ echo '<body>'
 
 
 
+##################
+repo_path=sx-app
+# repo_path=im_warehouse/client
+build_path=sx-app-build
+# build_path=warehouse-app-build
+branch_name=dev
+##################
 
 
 ## SX-APP
 
 echo '-----------------------------------'
-cd /home/ubuntu/sx-app
+cd /home/ubuntu/$repo_path
 git reset --hard
-git checkout -f dev
+git checkout -f $branch_name
 echo 'pulling application'
 git pull
 
 echo '-----------------------------------'
 echo 'installing packages'
-
 npm install
+echo '-----------------------------------'
+echo 'building app'
 npm run build
 
 echo '-----------------------------------'
-rm -rf /home/ubuntu/sx-app-build
-cp -r /home/ubuntu/sx-app/dist /home/ubuntu/sx-app-build
+rm -rf /home/ubuntu/$build_path
+cp -r /home/ubuntu/$repo_path/dist /home/ubuntu/$build_path
 
 
 
