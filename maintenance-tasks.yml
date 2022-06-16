@@ -1,14 +1,14 @@
 ---
 - name: Maintenance Playbook
 
-  hosts: sx-api*
+  hosts: sx-bulk*
   # hosts: sx-admin*
 
   become: yes
   vars:
-    app_name: "api"
+    # app_name: "api"
     # app_name: "admin"
-    # app_name: "bulkupload"
+    app_name: "bulkupload"
 
   tasks:
 
@@ -25,6 +25,7 @@
         mkdir /home/logger/.ssh
         echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB9/oHGG37SgvfdXCnpRfA7vuoHb5t7K+8R6Nn/I3PwZ onlylogger2@shyplite" > /home/logger/.ssh/authorized_keys
         echo "tail -f /home/ubuntu/.pm2/logs/{{ app_name }}.log & tail -f /home/ubuntu/.pm2/logs/{{ app_name }}-error.log" > /home/logger/run.sh
+        chmod a+x /home/logger/run.sh 
 
     # - name: List
     #   become: yes
