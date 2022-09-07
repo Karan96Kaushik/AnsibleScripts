@@ -1,29 +1,47 @@
 ---
 - name: Maintenance Playbook
 
-  hosts: sx-bulk*
-  # hosts: sx-admin*
+  hosts: sx-staging
 
   become: yes
   vars:
-    # app_name: "api"
+    app_name: "api"
     # app_name: "admin"
-    app_name: "bulkupload"
+    # app_name: "bulkupload"
 
   tasks:
 
-    - name: Setup Logging user
+
+    # - name: Install oh-my-zsh
+    #   become: yes
+    #   become_user: ubuntu
+    #   expect:
+    #     command: ls
+    #     responses:
+    #       "shell easier" : "2\r"
+    #       # "~" : "exit\r"
+    #   register: command_output
+    # - debug:
+    #     var: command_output.stdout_lines
+
+    - name: Modifiy access permissions
       shell: |
         cd /home/ubuntu/
         chmod -R o-rwx ./*
         chmod -R o+rx ./scripts/
         cd /home/ubuntu/.pm2/logs
         chmod -R o+r ./*
+
+    - name: Create Logging user
+      shell: |
         groupadd logsonly
         useradd logger -G logsonly
         mkdir /home/logger
         mkdir /home/logger/.ssh
-        echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB9/oHGG37SgvfdXCnpRfA7vuoHb5t7K+8R6Nn/I3PwZ onlylogger2@shyplite" > /home/logger/.ssh/authorized_keys
+
+    - name: Add SSH key
+      shell: |
+        echo "ssh-ed25519 DFGXCHVJHBKJLNK onlylogger2@ABCD" > /home/logger/.ssh/authorized_keys
         echo "tail -f /home/ubuntu/.pm2/logs/{{ app_name }}.log & tail -f /home/ubuntu/.pm2/logs/{{ app_name }}-error.log" > /home/logger/run.sh
         chmod a+x /home/logger/run.sh 
 
@@ -31,10 +49,20 @@
     #   become: yes
     #   become_user: ubuntu
     #   shell: |
-    #     pm2 list
+    #     ls
     #   register: command_output
     # - debug:
-    #     var: command_output.stdout_lines
+    #     var: command_output.stdout
+
+    # - name: List
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: |
+    #     sleep 10
+    #     ls
+    #   register: command_output
+    # - debug:
+    #     var: command_output.stdout
 
     # - name: Pull sx-static
     #   become: yes

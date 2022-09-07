@@ -17,7 +17,7 @@
 
     - name: Copy FCGI conf
       ansible.builtin.copy:
-        src: /Users/karan/Documents/ansible-playbooks/auto-deployment/fcgiwrap.service
+        src: ../statics/auto-deployment/fcgiwrap.service
         dest: /lib/systemd/system/fcgiwrap.service
 
     - name: Restart FCGI as ubuntu
@@ -27,7 +27,7 @@
 
     - name: Copy NGINX conf
       ansible.builtin.copy:
-        src: /Users/karan/Documents/ansible-playbooks/auto-deployment/nginx-auto-deployment.conf
+        src: ../statics/auto-deployment/nginx-auto-deployment.conf
         dest: /etc/nginx/sites-available/auto-deployment.conf
 
     - name: Create NGINX symbolic link 
@@ -41,7 +41,7 @@
 
     - name: Copy deploy.cgi file
       ansible.builtin.copy:
-        src: /Users/karan/Documents/ansible-playbooks/auto-deployment/deploy.cgi
+        src: ../statics/auto-deployment/deploy.cgi
         dest: /home/ubuntu/scripts/cgi-bin/deploy.cgi
 
     - name: Create cgi-bin dir

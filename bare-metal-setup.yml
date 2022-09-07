@@ -1,6 +1,6 @@
 ---
 - name: Bare Metal Setup Playbook
-  hosts: im-warehouse # shypstation
+  hosts: devops
   become: yes
 
   tasks:
@@ -25,7 +25,7 @@
         swapon /swapfile
 
     - name: Download oh-my-zsh
-      shell: touch install.sh && wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh > install.sh && chmod +x install.sh 
+      shell: wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && chmod +x install.sh 
   
     - name: Install oh-my-zsh
       become: yes

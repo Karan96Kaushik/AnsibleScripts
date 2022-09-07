@@ -3,20 +3,20 @@
   hosts: im-admin
   become: yes
   vars:
-    server_type: "reverse-proxy"
-    # server_type: "static-files"
+    # server_type: "reverse-proxy"
+    server_type: "static-files"
 
   tasks:
 
-    - name: Install certbot
-      apt:
-        name: certbot=0.40.0*
-        state: present
+    # - name: Install certbot
+    #   apt:
+    #     name: certbot=0.40.0*
+    #     state: present
 
-    - name: Install certbot-nginx
-      apt:
-        name: python3-certbot-nginx
-        state: present
+    # - name: Install certbot-nginx
+    #   apt:
+    #     name: python3-certbot-nginx
+    #     state: present
 
     - name: Install NGINX 1.18
       apt:
@@ -42,12 +42,12 @@
     - name: Restart NGINX
       service: name=nginx state=restarted enabled=yes
 
-    - name: Generate and Install certificate
-      expect:
-        command: certbot --nginx -d hq.importee.club
-        responses:
-          '"(used for urgent renewal and security notices)"' : "karan@shyplite.com\r"
-          '"(A)gree/(C)ancel"' : "A\r"
-          '"(Y)es/(N)o"' : "N\r"
-          'Select the appropriate number' : "2\r"
-          'press "c" to cancel' : "2\r"
+    # - name: Generate and Install certificate
+    #   expect:
+    #     command: certbot --nginx -d hq.importee.club
+    #     responses:
+    #       '"(used for urgent renewal and security notices)"' : "karan@shyplite.com\r"
+    #       '"(A)gree/(C)ancel"' : "A\r"
+    #       '"(Y)es/(N)o"' : "N\r"
+    #       'Select the appropriate number' : "2\r"
+    #       'press "c" to cancel' : "2\r"

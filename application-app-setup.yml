@@ -1,6 +1,6 @@
 ---
 - name: App Setup Playbook
-  hosts: im-warehouse
+  hosts: sx-warehouse-1
   become: yes
 
   vars:
@@ -13,28 +13,28 @@
 
   tasks:
 
-    - name: Copy SSH Key
-      ansible.builtin.copy:
-        src: application/admin-pvt-ssh-key
-        dest: /home/ubuntu/.ssh/id_ed25519
+    # - name: Copy SSH Key
+    #   ansible.builtin.copy:
+    #     src: application/admin-pvt-ssh-key
+    #     dest: /home/ubuntu/.ssh/id_ed25519
 
-    - name: Copy Public SSH Key
-      ansible.builtin.copy:
-        src: application/admin-pub-ssh-key
-        dest: /home/ubuntu/.ssh/id_ed25519.pub
+    # - name: Copy Public SSH Key
+    #   ansible.builtin.copy:
+    #     src: application/admin-pub-ssh-key
+    #     dest: /home/ubuntu/.ssh/id_ed25519.pub
 
-    - name: Clone repo (also adds github SSH fingerpring if prompted)
-      become: yes
-      become_user: ubuntu
-      expect:
-        command: git clone git@github.com:shyplite/{{ repo_name }}.git 
-        responses:
-          "fingerprint" : "yes\r"
+    # - name: Clone repo (also adds github SSH fingerpring if prompted)
+    #   become: yes
+    #   become_user: ubuntu
+    #   expect:
+    #     command: git clone git@github.com:shyplite/{{ repo_name }}.git 
+    #     responses:
+    #       "fingerprint" : "yes\r"
       
-    - name: Checkout dev
-      become: yes
-      become_user: ubuntu
-      shell: cd /home/ubuntu/ 
+    # - name: Checkout dev
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: cd /home/ubuntu/ 
 
       #&& git checkout dev
 
@@ -62,32 +62,32 @@
     - name: Restart NGINX
       service: name=nginx state=restarted enabled=yes
 
-    - name: Setup node version 14.19 using n version manager - required for Vue packages
-      become: yes
-      shell:
-        cmd: n 14.19
+    # - name: Setup node version 14.19 using n version manager - required for Vue packages
+    #   become: yes
+    #   shell:
+    #     cmd: n 14.19
 
-    - name: Install packages based on package.json.
-      community.general.npm:
-        path: /home/ubuntu/{{ app_path }} 
+    # - name: Install packages based on package.json.
+    #   community.general.npm:
+    #     path: /home/ubuntu/{{ app_path }} 
     
-    - name: Build
-      shell: |
-        cd /home/ubuntu/{{ app_path }}
-        npm run build
+    # - name: Build
+    #   shell: |
+    #     cd /home/ubuntu/{{ app_path }}
+    #     npm run build
     
-    - name: Move dist folder
-      shell: |
-        cp -r /home/ubuntu/{{ app_path }}/dist /home/ubuntu/{{ repo_name }}-app-build
+    # - name: Move dist folder
+    #   shell: |
+    #     cp -r /home/ubuntu/{{ app_path }}/dist /home/ubuntu/{{ repo_name }}-app-build
 
-    - name: Test app setup
-      shell: |
-        sleep 3 
-        wget http://localhost/index.html
-        rm index.html
-      register: command_output
-    - debug:
-        var: command_output.stdout_lines      
+    # - name: Test app setup
+    #   shell: |
+    #     sleep 3 
+    #     wget http://localhost/index.html
+    #     rm index.html
+    #   register: command_output
+    # - debug:
+    #     var: command_output.stdout_lines      
 
 
 

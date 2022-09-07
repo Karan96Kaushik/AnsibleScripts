@@ -1,11 +1,11 @@
 ---
 - name: API/HQ Setup Playbook
-  hosts: im-admin
+  hosts: devops
   become: yes
 
   vars:
     static_branch: "master"
-    static_repo_name: "im-static"
+    static_repo_name: "sx-static"
 
     # repo_name: "sx-admin"
     # deployment_branch: "teststaging"
@@ -15,11 +15,15 @@
     # deployment_branch: "dev"
     # app_name: "api"
 
-    repo_name: "im-notification"
-    deployment_branch: "main"
-    app_name: "notification-prod"
+    # repo_name: "im-notification"
+    # deployment_branch: "main"
+    # app_name: "notification-prod"
 
-    port: 4000
+    repo_name: "sx-booking"
+    deployment_branch: "main"
+    app_name: "booking-prod"
+
+    port_number: 3300
 
   tasks:
 
@@ -40,76 +44,84 @@
         src: application/admin-pub-ssh-key
         dest: /home/ubuntu/.ssh/id_ed25519.pub
     
-    - name: Copy Environment
-      ansible.builtin.copy:
-        src: application/environment-api
-        dest: /home/ubuntu/.profile
+    # - name: Copy Environment
+    #   ansible.builtin.copy:
+    #     src: application/environment-api
+    #     dest: /home/ubuntu/.profile
 
-    - name: Create aws dir
-      shell: "mkdir /home/ubuntu/.aws -p"
+    # - name: Create aws dir
+    #   shell: "mkdir /home/ubuntu/.aws -p"
     
-    - name: Copy AWS credentials
-      ansible.builtin.copy:
-        src: application/aws-credentials
-        dest: /home/ubuntu/.aws/credentials
+    # - name: Copy AWS credentials
+    #   ansible.builtin.copy:
+    #     src: application/aws-credentials
+    #     dest: /home/ubuntu/.aws/credentials
   
-    - name: Source .profile by default
-      shell: 
-        cmd: echo "source /home/ubuntu/.profile" >> /home/ubuntu/.zshrc
+    # - name: Source .profile by default
+    #   shell: 
+    #     cmd: echo "source /home/ubuntu/.profile" >> /home/ubuntu/.zshrc
 
-    - name: Clone {{ repo_name }} repo on {{ deployment_branch }} branch (also adds github SSH fingerpring if prompted)
-      become: yes
-      become_user: ubuntu
-      expect:
-        command: git clone git@github.com:shyplite/{{ repo_name }}.git 
-        responses:
-          "fingerprint" : "yes\r"
+    # - name: Remove repos if exist 
+    #   shell: 
+    #     cmd: rm -rf {{ repo_name }} && rm -rf {{ static_repo_name }}
+
+    # - name: Clone {{ repo_name }} repo on {{ deployment_branch }} branch (also adds github SSH fingerpring if prompted)
+    #   become: yes
+    #   become_user: ubuntu
+    #   expect:
+    #     command: git clone git@github.com:shyplite/{{ repo_name }}.git 
+    #     responses:
+    #       "fingerprint" : "yes\r"
       
-    - name: Clone {{ static_repo_name }} {{ static_branch }} as sx-static
-      become: yes
-      become_user: ubuntu
-      shell: git clone git@github.com:shyplite/{{ static_repo_name }}.git {{ static_repo_name }}
+    # - name: Clone {{ static_repo_name }} {{ static_branch }} as sx-static
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: git clone git@github.com:shyplite/{{ static_repo_name }}.git {{ static_repo_name }}
 
-    - name: Checkout {{ deployment_branch }}
-      become: yes
-      become_user: ubuntu
-      shell: |
-        cd /home/ubuntu/{{ repo_name }}
-        git checkout {{ deployment_branch }} 
+    # - name: Checkout {{ deployment_branch }}
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: |
+    #     cd /home/ubuntu/{{ repo_name }}
+    #     git checkout {{ deployment_branch }} 
 
-    - name: Checkout {{ static_branch }}
-      become: yes
-      become_user: ubuntu
-      shell: |
-        cd /home/ubuntu/{{ static_repo_name }}
-        git checkout {{ static_branch }}
+    # - name: Checkout {{ static_branch }}
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: |
+    #     cd /home/ubuntu/{{ static_repo_name }}
+    #     git checkout {{ static_branch }}
         
-    - name: Install packages based on package.json.
-      community.general.npm:
-        path: /home/ubuntu/{{ repo_name }}
+    # - name: Install packages based on package.json.
+    #   become: yes
+    #   become_user: ubuntu
+    #   community.general.npm:
+    #     path: /home/ubuntu/{{ repo_name }}
         
-    - name: Source profile & Start app
-      become: yes
-      become_user: ubuntu
-      shell: |
-        . ~/.profile  
-        cd /home/ubuntu/ 
-        cd {{ repo_name }}
-        pm2_home="/home/ubuntu/.pm2" pm2 start bin/www --name {{ app_name }}
+    # - name: Source profile & Start app
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: |
+    #     . ~/.profile  
+    #     cd /home/ubuntu/ 
+    #     cd {{ repo_name }}
+    #     pm2_home="/home/ubuntu/.pm2" pm2 start bin/www --name {{ app_name }}
         
-    - name: Get log
-      shell: "sleep 3 && pm2 log {{ app_name }} --nostream"
-      register: command_output_log
-    - debug:
-        var: command_output_log.stdout_lines      
+    # - name: Get log
+    #   become: yes
+    #   become_user: ubuntu
+    #   shell: "sleep 3 && pm2 log {{ app_name }} --nostream"
+    #   register: command_output_log
+    # - debug:
+    #     var: command_output_log.stdout_lines      
         
-    - name: Test api setup
-      shell: |
-        sleep 3 
-        wget http://localhost:{{ port }}/
-      register: command_output
-    - debug:
-        var: command_output.stdout_lines      
+    # - name: Test api setup
+    #   shell: |
+    #     sleep 3 
+    #     wget http://localhost:{{ port_number }}/
+    #   register: command_output
+    # - debug:
+    #     var: command_output.stdout_lines      
 
 
 
